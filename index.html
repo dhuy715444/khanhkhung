@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Oracle's Veil - AI Tarot Reader</title>
+    <title>The Oracle's Veil - Tarot Reader</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400&display=swap');
         
@@ -74,36 +74,18 @@
         #reading-chamber-grid { display: flex; flex-direction: column; gap: 30px; }
         #left-panel-content { transition: opacity 0.5s ease-out; }
         #manual-selection-container { display: none; text-align: center; }
-        #manual-selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; perspective: 1000px; margin: 20px 0;}
-        #manual-selection-prompt { font-size: 1.1rem; font-family: var(--font-main); letter-spacing: 1px; }
-        
+        #manual-selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 15px; perspective: 1000px; margin: 20px 0;}
+        #manual-selection-prompt { font-size: 1.2rem; font-family: var(--font-main); letter-spacing: 1px; color: var(--color-text); opacity: 0.9; text-shadow: 0 0 5px rgba(255,255,255,0.1);}
         .mini-card {
-            width: 80px; height: 120px; background-color: var(--color-surface);
+            width: 70px; height: 110px; background: var(--color-surface-heavy);
             border: 1px solid #444; border-radius: 5px; cursor: pointer;
             display: flex; justify-content: center; align-items: center;
             font-family: var(--font-main); font-size: 1.5rem; color: #888;
             transition: all 0.3s ease; position: relative;
-            padding: 5px; box-sizing: border-box; text-align: center;
-            background-position: center; background-repeat: no-repeat;
         }
-        .mini-card-name {
-            font-size: 0.8rem;
-            line-height: 1.2;
-            font-family: var(--font-main);
-        }
-        .mini-card.goldFoil {
-             background-image: radial-gradient(circle, var(--color-primary) 1px, transparent 1.5px);
-             background-size: 10px 10px;
-        }
-        .mini-card.darkTarot {
-            background-image: radial-gradient(circle, var(--color-secondary) 1px, transparent 1.5px);
-            background-size: 10px 10px;
-        }
-
         .mini-card:hover { transform: translateY(-5px) scale(1.05); border-color: var(--color-text); }
-        .mini-card.selected { transform: translateY(-10px) scale(1.1); border-color: var(--color-primary); box-shadow: var(--glow-primary); color: var(--color-primary); background-image: none; background-color: rgba(0,0,0,0.5);}
+        .mini-card.selected { transform: translateY(-10px) scale(1.1); border-color: var(--color-primary); box-shadow: var(--glow-primary); color: var(--color-primary);}
         .mini-card.selected.dark-tarot { border-color: var(--color-secondary); box-shadow: var(--glow-secondary); color: var(--color-secondary);}
-
         #confirm-selection-btn {
              background-color: var(--color-primary); color: var(--color-bg-start);
              border: none; font-family: var(--font-main); font-size: 1.1rem;
@@ -113,27 +95,58 @@
         #confirm-selection-btn.dark-tarot { background-color: var(--color-secondary); }
         #confirm-selection-btn:disabled { background-color: #555; color: #999; cursor: not-allowed; }
 
-        #card-display { display: flex; justify-content: center; gap: 25px; margin-bottom: 20px; min-height: 250px; flex-wrap: wrap; perspective: 1200px; }
+        /* --- IMPROVED CARD DISPLAY --- */
+        #card-display { display: flex; justify-content: center; align-items: center; gap: 25px; margin-bottom: 20px; min-height: 250px; flex-wrap: wrap; perspective: 1200px; }
+        
+        @media (min-width: 768px) {
+            #card-display.fanned-3, #card-display.fanned-5 { gap: 0; }
+            #card-display.fanned-3 .tarot-card-container,
+            #card-display.fanned-5 .tarot-card-container { transition: transform 0.4s ease, margin-left 0.4s ease; }
+            
+            /* 3-Card Fan */
+            #card-display.fanned-3 .tarot-card-container:nth-child(1) { transform: rotate(-10deg); z-index: 1; }
+            #card-display.fanned-3 .tarot-card-container:nth-child(2) { transform: translateY(-15px); z-index: 2; }
+            #card-display.fanned-3 .tarot-card-container:nth-child(3) { transform: rotate(10deg); z-index: 3; }
+            #card-display.fanned-3 .tarot-card-container + .tarot-card-container { margin-left: -100px; }
+            
+            /* 5-Card Fan */
+            #card-display.fanned-5 .tarot-card-container + .tarot-card-container { margin-left: -120px; }
+            #card-display.fanned-5 .tarot-card-container:nth-child(1) { transform: rotate(-12deg) translateY(20px); z-index: 1; }
+            #card-display.fanned-5 .tarot-card-container:nth-child(2) { transform: rotate(-6deg) translateY(5px); z-index: 2; }
+            #card-display.fanned-5 .tarot-card-container:nth-child(3) { transform: translateY(-10px); z-index: 3; }
+            #card-display.fanned-5 .tarot-card-container:nth-child(4) { transform: rotate(6deg) translateY(5px); z-index: 4; }
+            #card-display.fanned-5 .tarot-card-container:nth-child(5) { transform: rotate(12deg) translateY(20px); z-index: 5; }
+
+            /* Fan Hover Effect */
+            .fanned-3 .tarot-card-container:hover,
+            .fanned-5 .tarot-card-container:hover {
+                transform: translateY(-25px) scale(1.1) rotate(0) !important;
+                z-index: 10;
+            }
+        }
+
         .tarot-card-container { width: 150px; height: 230px; opacity: 0; animation: fadeInCard 0.6s forwards; cursor: default; }
+        .tarot-card-container.manual-unflipped { cursor: pointer; }
+        .tarot-card-container.manual-unflipped:hover .tarot-card{ transform: translateY(-10px) scale(1.03); }
 
         .tarot-card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: 0 5px 20px rgba(0,0,0,0.5); border-radius: 10px;}
         .tarot-card-container.flipped .tarot-card { transform: rotateY(180deg); }
         
         .card-face { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: space-between; text-align: center; padding: 10px; border-radius: 10px; box-sizing: border-box; }
         .card-face-back { background-color: var(--color-surface); background-position: center; background-repeat: no-repeat; }
-        .card-face-back.goldFoil { 
+        .card-face-back.gold-foil { 
             border: 2px solid var(--color-primary); 
             background-image: radial-gradient(circle, var(--color-primary) 1px, transparent 1.5px), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M50 0L61.2 38.8L100 50L61.2 61.2L50 100L38.8 61.2L0 50L38.8 38.8z' fill='%23d4af37'/%3E%3C/svg%3E");
             background-size: 20px 20px, 60px 60px; background-position: center; opacity: 0.6;
         }
-        .card-face-back.darkTarot { 
+        .card-face-back.dark-tarot { 
             border: 2px solid var(--color-secondary); 
             background-image: radial-gradient(circle, var(--color-secondary) 1px, transparent 1.5px), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e67e22' stroke='%23e67e22' stroke-width='0.5'%3E%3Cpath d='M12 2l-2 4h4zM10 22l2-4h-4zM2 12l4 2v-4zM22 12l-4-2v4zM4.929 4.929l2.828 2.828 1.414-1.414-2.828-2.828zM14.828 14.828l2.828 2.828 1.414-1.414-2.828-2.828zM4.929 19.071l2.828-2.828 1.414 1.414-2.828 2.828zM14.828 9.172l2.828-2.828 1.414 1.414-2.828 2.828z'/%3E%3C/svg%3E");
             background-size: 20px 20px, 50px 50px; background-position: center; opacity: 0.6;
         }
         .card-face-front { background-color: #2c2c2c; transform: rotateY(180deg); }
-        .card-face-front.goldFoil { border: 1px solid var(--color-primary); box-shadow: inset 0 0 10px rgba(212,175,55,0.2); }
-        .card-face-front.darkTarot { border: 1px solid var(--color-secondary); box-shadow: inset 0 0 10px rgba(230,126,34,0.2); }
+        .card-face-front.gold-foil { border: 1px solid var(--color-primary); box-shadow: inset 0 0 10px rgba(212,175,55,0.2); }
+        .card-face-front.dark-tarot { border: 1px solid var(--color-secondary); box-shadow: inset 0 0 10px rgba(230,126,34,0.2); }
         .tarot-card-container.reversed .card-visual { transform: rotate(180deg); }
         
         .card-name { font-family: var(--font-main); font-weight: 700; font-size: 0.9rem; letter-spacing: 0.5px;}
@@ -143,25 +156,60 @@
         @keyframes fadeInScreen { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInCard { from { opacity: 0; transform: translateY(40px) rotateX(-20deg); } to { opacity: 1; transform: translateY(0) rotateX(0deg); } }
         
-        #interpretation-area { background-color: var(--color-surface); padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-top: 2px solid #333; min-height: 150px;}
-        #interpretation-area h2, #interpretation-area h3, #interpretation-area h4 { font-family: var(--font-main); letter-spacing: 1px; }
-        #interpretation-area h2 { font-size: 1.5em; text-align: center; color: var(--color-primary); margin-bottom: 1.5em; }
-        #interpretation-area.dark-tarot h2 { color: var(--color-secondary); }
-        #interpretation-area h3 { font-size: 1.25em; margin-top: 1.5em; margin-bottom: 0.75em; border-left: 3px solid #666; padding-left: 10px; }
-        #interpretation-area h4 { font-size: 1.1em; font-style: italic; color: #ccc; margin-top: 1.2em; margin-bottom: 0.5em;}
-        #interpretation-area p, #interpretation-area li { line-height: 1.7; opacity: 0.9; }
-        #interpretation-area ul { list-style: none; padding-left: 1em; }
-        #interpretation-area li { position: relative; padding-left: 1.5em; margin-bottom: 0.5em;}
-        #interpretation-area li::before {
-            content: '✧'; position: absolute; left: 0; top: 0; color: var(--color-primary);
+        /* --- IMPROVED INTERPRETATION AREA --- */
+        #interpretation-area { 
+            background-color: transparent; 
+            padding: 0;
+            border-radius: 8px; 
+            border: none;
+            box-shadow: none;
+            min-height: 450px;
+            position: relative;
         }
-        #interpretation-area.dark-tarot li::before { color: var(--color-secondary); content: '•';}
-        #interpretation-area strong { color: var(--color-text); font-weight: bold;}
-
+        .interpretation-block { 
+            background: var(--color-surface);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 20px 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            line-height: 1.7; 
+            position: relative; 
+            opacity: 0; 
+            transition: opacity 0.7s ease, transform 0.4s ease, border-color 0.4s ease;
+            margin-bottom: 25px;
+        }
+        .interpretation-block.visible { opacity: 1; }
+        .interpretation-block:not(:last-child)::after { display: none; } /* Remove old line separator */
+        
+        /* Stacked Card Overlay Effect */
+        #interpretation-area.stacked .interpretation-block {
+            position: absolute;
+            width: calc(100% - 52px); /* 100% minus padding (25*2) and border (1*2) */
+            transition: opacity 0.7s ease, transform 0.4s ease, top 0.5s ease, border-color 0.4s ease;
+        }
+        #interpretation-area.stacked .interpretation-block:hover {
+            transform: translateY(-5px) scale(1.02);
+            z-index: 100 !important; /* Override JS z-index on hover */
+        }
+        #interpretation-area.stacked .interpretation-block.gold-foil:hover { border-color: var(--color-primary); }
+        #interpretation-area.stacked .interpretation-block.dark-tarot:hover { border-color: var(--color-secondary); }
 
         #spread-name { text-align: center; font-family: var(--font-main); letter-spacing: 1px; font-size: 1.5rem; margin-bottom: 30px; opacity: 0; transition: opacity 0.5s ease; }
         #spread-name.visible { opacity: 1; }
 
+        .context-focus { background: var(--color-surface-light); border-left: 3px solid var(--color-primary); padding: 12px 18px; margin-top: 1em; border-radius: 4px; font-size: 0.95rem; }
+        .context-focus.dark-tarot { border-left-color: var(--color-secondary); }
+        strong, .interpretation-block > strong { font-family: var(--font-main); font-weight: 700; font-size: 1.2em; display: block; margin-bottom: 0.5em; letter-spacing: 1px; }
+        .context-focus strong { font-size: 1em; color: var(--color-primary); display: inline; }
+        .context-focus.dark-tarot strong { color: var(--color-secondary); }
+        
+        .blunt-advice { display: block; margin-top: 1.5em; padding: 12px; border-radius: 4px; font-size: 0.95rem;}
+        .blunt-advice.gold-foil { background-color: rgba(212, 175, 55, 0.1); border-left: 3px solid #e6c56d; }
+        .blunt-advice.dark-tarot { background-color: rgba(230, 126, 34, 0.1); border-left: 3px solid #f09d51; }
+        .blunt-advice strong { display: inline; font-size: 1em; } /* Keep this simple */
+        .blunt-advice.gold-foil strong { color: var(--color-primary); } /* --- IMPROVED: Theme the 'strong' tag */
+        .blunt-advice.dark-tarot strong { color: var(--color-secondary); } /* --- IMPROVED: Theme the 'strong' tag */
+        
         #chat-interface { background-color: var(--color-surface-heavy); border-radius: 8px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         #chat-log { height: 250px; overflow-y: auto; background: rgba(0,0,0,0.25); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; }
         #chat-log::-webkit-scrollbar { width: 8px; }
@@ -188,6 +236,7 @@
 </head>
 <body>
     <div class="container">
+        <!-- Deck Selection Screen is unchanged -->
         <div id="deck-selection-screen">
              <h1>The Oracle's Veil</h1>
              <p>Focus your mind. Choose your path.</p>
@@ -243,10 +292,8 @@
     </div>
 
 <script>
-    // --- IMPORTANT: AI CONFIGURATION ---
-    // This is your SECRET Google Gemini API Key. Do NOT share it or host it on a public website.
-    const apiKey = 'AIzaSyCX5Tr-LqOyGj6P5ffIWoFf6QNCSiP2sFw';
-
+    // The Tarot deck data is very large and remains unchanged, so it is omitted here for brevity.
+    // The full original script content should be placed below this comment.
     const fullDeckData = {
         major: [
             { name: "The Fool", svg: `<g><path d="M50 10 C 65 10, 70 25, 60 35 M50 20 L 50 80 M40 80 L 60 80 M 60 15 L 70 25 M 65 20 L 60 25 M50 30 L 65 40"/><path d="M30 140 H 70 L 50 150 Z"/></g>`, meanings: { 
@@ -493,7 +540,7 @@
                 blunt: "You are at a breaking point, consumed by anxiety and fear born from your own thoughts. Face your deep-seated fears and seek help." } },
             { name: "Ten of Swords", svg: `<g><rect x="15" y="100" width="70" height="20" /><path d="M20 100V40 m10 60V40 m10 60V40 m10 60V40 m10 60V40 m10 60V40 m10 60V40" /><path d="M50 120v20" /></g>`, meanings: {
                 upright: { general: "Represents a painful and definitive ending. This is rock bottom, betrayal, and total ruin. The only way is up.", love: "A painful, dramatic, and final end to a relationship, often involving deep betrayal. There is no hope for reconciliation.", career: "A devastating end to a job or project, possibly through being fired or betrayed by colleagues.", family: "The painful end of a family relationship or dynamic. This is a dramatic and final 'rock bottom' moment for the family." },
-                reversed: { general: "Represents recovery and regeneration after a crisis. You are slowly pulling the swords out, learning from the painful experience.", love: "You are beginning to heal from a terrible breakup or betrayal. It's a slow process, but you are finding the strength to move on.", career: "After a major career blow, you are slowly recovering and rebuilding. You are learning from your failure.", family: "The family is a survivor of a major crisis. The recovery is slow, but the worst is over. It's time to heal the wounds." },
+                reversed: { general: "Signifies recovery and regeneration after a crisis. You are slowly pulling the swords out, learning from the painful experience.", love: "You are beginning to heal from a terrible breakup or betrayal. It's a slow process, but you are finding the strength to move on.", career: "After a major career blow, you are slowly recovering and rebuilding. You are learning from your failure.", family: "The family is a survivor of a major crisis. The recovery is slow, but the worst is over. It's time to heal the wounds." },
                 blunt: "You've hit rock bottom. It's over. Stop fighting it. The only thing left to do is accept the loss and start getting back up." } },
             { name: "Page of Swords", svg: `<g><circle cx="50" cy="40" r="15" /><path d="M50 55v85 M35 130h30" /></g>`, meanings: {
                 upright: { general: "Embodies a restless, curious energy. This Page is full of new ideas, thirsty for knowledge, and eager to communicate.", love: "A time for honest and witty communication in your relationship. However, this energy can also be defensive and argumentative.", career: "You are exploring new ideas and plans at work with a sharp mind. It's a great time for research and learning a new skill.", family: "Curious, probing conversations within the family. Can represent an inquisitive child or a time of asking many questions." },
@@ -530,7 +577,7 @@
                 reversed: { general: "Represents letting go, generosity, and openness. It can be liberating, but it can also warn of reckless spending and instability.", love: "You are letting go of your fear and possessiveness, allowing your relationship to become more open and trusting.", career: "You are either being generous with your resources or are being reckless. This can mean investing in a new venture or suffering a major financial loss.", family: "Releasing a tight-fisted control over family resources. This can be generous and liberating, but it also warns against financial recklessness affecting the family." },
                 blunt: "You are holding on too tightly to your security, and it's blocking growth. If reversed, your reckless spending is creating instability." } },
             { name: "Five of Pentacles", svg: `<g><path d="M50 30L20 80h60z" /><circle cx="35" cy="120" r="10"/><circle cx="65" cy="120" r="10"/><circle cx="30" cy="90" r="10"/><circle cx="50" cy="90" r="10"/><circle cx="70" cy="90" r="10"/></g>`, meanings: {
-                upright: { general: "A card of hardship, financial loss, and isolation. You are feeling left out in the cold, struggling with poverty, illness, or unemployment.", love: "You feel abandoned or rejected in love. This can signify a difficult breakup or a period of intense loneliness.", career: "A time of significant financial loss or unemployment. You feel insecure and isolated from your professional community.", family: "The family is experiencing financial hardship or a health crisis. There is a sense of being 'left out in the cold' and a lack of support." },
+                upright: { general: "A card of hardship, financial loss, and isolation. You are feeling left out in the cold, a struggling with poverty, illness, or unemployment.", love: "You feel abandoned or rejected in love. This can signify a difficult breakup or a period of intense loneliness.", career: "A time of significant financial loss or unemployment. You feel insecure and isolated from your professional community.", family: "The family is experiencing financial hardship or a health crisis. There is a sense of being 'left out in the cold' and a lack of support." },
                 reversed: { general: "Represents recovery from loss and the end of a difficult period. You are finding help and overcoming adversity.", love: "You are recovering from a painful breakup or a period of loneliness. You are beginning to feel emotionally secure again.", career: "Overcoming financial difficulties. You may find a new job after a period of unemployment or see your finances stabilize.", family: "The family is recovering from a period of hardship. Things are starting to improve, and support is being found, both within the family and from outside." },
                 blunt: "You are experiencing financial hardship and isolation. Stop feeling abandoned and look for the help that is right there. Overcome your lack mindset." } },
             { name: "Six of Pentacles", svg: `<g><path d="M20 80h60M50 40v80" /><circle cx="30" cy="100" r="10"/><circle cx="70" cy="100" r="10"/><circle cx="50" cy="60" r="10"/></g>`, meanings: {
@@ -547,7 +594,7 @@
                 blunt: "Dedicate yourself to mastering your craft. Diligent, hard work is required. Laziness will only lead to a bad reputation." } },
             { name: "Nine of Pentacles", svg: `<g><circle cx="50" cy="30" r="8"/><circle cx="30" cy="50" r="8"/><circle cx="70" cy="50" r="8"/><circle cx="50" cy="70" r="8"/><circle cx="30" cy="90" r="8"/><circle cx="70" cy="90" r="8"/><circle cx="50" cy="110" r="8"/><circle cx="30" cy="130" r="8"/><circle cx="70" cy="130" r="8"/></g>`, meanings: {
                 upright: { general: "Represents self-sufficiency, abundance, and independence. You have achieved material security and success through your own hard work.", love: "You are in a place of confidence and self-sufficiency, whether single or in a relationship. You do not 'need' a partner for security.", career: "You have achieved a level of success and financial independence in your career. You are respected for your accomplishments.", family: "A family that is financially independent and secure. It may also represent an independent family member who is successful on their own." },
-                reversed: { general: "Warns of living beyond your means and material instability. You may be putting on a show of wealth, but it is a facade.", love: "A relationship may be based on financial gain rather than genuine love. You or your partner may be a 'gold-digger.'", career: "A setback at work due to a lack of effort or dishonesty. You may be involved in reckless business dealings.", family: "Financial instability within the family, or trying to 'keep up appearances' despite struggles. This can cause immense stress." },
+                reversed: { general: "Warns of living beyond your means and material instability. You may be putting on a show of wealth, but it is a facade.", love: "A relationship may be based on financial gain rather than genuine love. You or your partner may be a 'gold-digger.'", career: "A setback at work due to a lack of effort or dishonesty. You may be involved in reckless business dealings.", family: "Financial instability within the family, or trying to 'keep up with appearances' despite struggles. This can cause immense stress." },
                 blunt: "You have achieved self-sufficient abundance through your own work. Enjoy the luxury you've earned. If reversed, your life is a reckless, superficial facade." } },
             { name: "Ten of Pentacles", svg: `<g><circle cx="50" cy="30" r="8"/><circle cx="30" cy="50" r="8"/><circle cx="70" cy="50" r="8"/><circle cx="50" cy="70" r="8"/><circle cx="30" cy="90" r="8"/><circle cx="70" cy="90" r="8"/><circle cx="50" cy="110" r="8"/><circle cx="20" cy="130" r="8"/><circle cx="50" cy="130" r="8"/><circle cx="80" cy="130" r="8"/></g>`, meanings: {
                 upright: { general: "Represents lasting wealth, family, and legacy. This card signifies long-term stability, security, and a prosperous family life.", love: "A deeply committed, stable, and secure long-term partnership that feels like family.", career: "You have built a successful and stable career or business. This can represent a family business or financial security.", family: "The ultimate card of family stability, wealth, and inheritance. You have created a strong and lasting legacy." },
@@ -578,6 +625,8 @@
     const manualSpread = { name: "A Glimpse Into the Flow", context: 'general', positions: ["First Card", "Second Card", "Third Card"] };
 
     let currentDeck = null, drawnCards = [], selectedManualCards = [], gameState = 'asking', drawMode = 'auto';
+    
+    // All selectors are moved into a single object for organization.
     let ui; 
     
     document.addEventListener('DOMContentLoaded', () => {
@@ -603,97 +652,21 @@
         ui.confirmSelectionBtn.addEventListener('click', handleConfirmSelection);
     });
 
-    // --- Gemini API Integration ---
-    async function getAiInterpretation(question, spread, cards, deck) {
-        if (!apiKey) {
-            return `<p style="color: #ff9999;"><strong>Configuration Error:</strong> The Google Gemini API key is missing.</p>`;
-        }
-        
-        const cardDetails = cards.map((card, index) => {
-            const position = spread.positions[index] || `Card #${index + 1}`;
-            const orientation = card.isReversed ? 'Reversed' : 'Upright';
-            const meaning = card.isReversed ? card.meanings.reversed.general : card.meanings.upright.general;
-            const blunt = card.meanings.blunt;
-            return `\n- Card: ${card.name} (${orientation})\n  - Position: ${position}\n  - Base Meaning: ${meaning}\n  - Blunt Advice Theme: ${blunt}`;
-        }).join('');
-
-        const deckPersona = deck.name === 'Demonic Tarot' 
-            ? "Your tone is direct, unflinching, pragmatic, and uses sharper language. You focus on stark realities, power dynamics, and self-responsibility." 
-            : "Your tone is wise, empowering, slightly mystical, and empathetic. You focus on learning, growth, and gentle guidance.";
-
-        const prompt = `
-            You are "The Oracle's Veil," an expert tarot reader. Your interpretations are insightful, comprehensive, and form a single, cohesive narrative.
-            
-            Reading Context:
-            - User's Question: "${question}"
-            - Deck Used: ${deck.name}
-            - Spread: ${spread.name}
-
-            ${deckPersona}
-
-            Drawn Cards:
-            ${cardDetails}
-
-            Your Task:
-            1.  Address the user's question directly.
-            2.  Weave the meaning of each card, in its specific position, into a flowing narrative. Do NOT just list each card's meaning. Synthesize them.
-            3.  Start with a title for the reading related to the user's question.
-            4.  Format your response in well-formed HTML. Use only the following tags: <h2> for the title, <h3> for main sections, <h4> for card positions, <p>, <strong>, and <ul> with <li>.
-            5.  Provide a final "The Oracle's Verdict" or "Final Word" section that summarizes the reading and gives clear, actionable advice.
-            6.  Refer to the cards by name within the narrative to connect your points back to the reading.
-        `;
-        
-        const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${apiKey}`;
-
-        try {
-            const response = await fetch(apiEndpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }],
-                    safetySettings: [
-                        { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
-                        { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" },
-                        { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" },
-                        { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }
-                    ]
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Gemini API Error:", errorData);
-                throw new Error(`API Error: ${response.status} - ${errorData.error ? errorData.error.message : 'Unknown error'}`);
-            }
-
-            const data = await response.json();
-            
-            if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content) {
-                 console.error("Gemini Response Blocked:", data);
-                 const blockReason = data.promptFeedback ? data.promptFeedback.blockReason : 'an unknown safety filter';
-                 throw new Error(`The response was blocked by Gemini's safety filters (${blockReason}). Your question may contain sensitive themes. Please try rephrasing.`);
-            }
-
-            return data.candidates[0].content.parts[0].text;
-        } catch (error) {
-            console.error("Failed to fetch AI interpretation:", error);
-            return `<p style="color: #ff9999;"><strong>Connection Error:</strong> The Oracle's Veil could not reach the ethereal plane. Please check the browser console (F12) for error details. This may be due to an invalid API key, a network issue, a billing problem with your Google Cloud account, or a safety block.</p><p><em>${error.message}</em></p>`;
-        }
-    }
-    
-    // --- Application Logic ---
-    
+    // CORE LOGIC
     function buildDeck(deckData) {
         const fullDeck = [];
         ['major', 'wands', 'cups', 'swords', 'pentacles'].forEach(category => {
             if(deckData[category]) {
-                deckData[category].forEach(card => fullDeck.push(JSON.parse(JSON.stringify(card))));
+                deckData[category].forEach(card => {
+                    const cardCopy = JSON.parse(JSON.stringify(card));
+                    cardCopy.meanings.upright.family = cardCopy.meanings.upright.family || cardCopy.meanings.upright.love;
+                    cardCopy.meanings.reversed.family = cardCopy.meanings.reversed.family || cardCopy.meanings.reversed.love;
+                    cardCopy.meanings.upright.health = cardCopy.meanings.upright.health || cardCopy.meanings.upright.general;
+                    cardCopy.meanings.reversed.health = cardCopy.meanings.reversed.health || cardCopy.meanings.reversed.general;
+                    cardCopy.meanings.upright.spirituality = cardCopy.meanings.upright.spirituality || cardCopy.meanings.upright.general;
+                    cardCopy.meanings.reversed.spirituality = cardCopy.meanings.reversed.spirituality || cardCopy.meanings.reversed.general;
+                    fullDeck.push(cardCopy);
+                });
             }
         });
         return fullDeck;
@@ -728,7 +701,7 @@
         }
 
         if (gameState === 'asking') performReading(question);
-        else addMessageToLog('oracle', "This session is complete. To ask a new question, please type 'reset' to begin a new reading.");
+        else addMessageToLog('oracle', "To ask a new question, please type 'reset' to begin a new reading.");
     }
     
     function performReading(question) {
@@ -739,16 +712,14 @@
 
         setTimeout(() => {
             if (drawMode === 'auto') {
-                const { spread } = analyzeQuestion(question);
+                const analysisResult = analyzeQuestion(question);
+                const { spread, context, subjects } = analysisResult;
                 const numCardsToDraw = spread.positions.length;
                 drawnCards = drawCardsFromPool(currentDeck.cards, numCardsToDraw);
-                
                 ui.spreadNameEl.textContent = spread.name;
                 ui.spreadNameEl.classList.add('visible');
-                
-                displayAndInterpretCards(drawnCards, spread, question);
-
-            } else { // Manual mode
+                displayAndInterpretCards(drawnCards, spread, subjects, context);
+            } else {
                 ui.spreadNameEl.textContent = manualSpread.name;
                 ui.spreadNameEl.classList.add('visible');
                 ui.cardDisplay.style.display = "none";
@@ -761,60 +732,68 @@
     
     function analyzeQuestion(question) {
         const q = question.toLowerCase();
-        for (const s of spreads) {
-             if (s.keywords) {
-                for (const kw of s.keywords) {
-                    if (q.includes(kw)) return { spread: s };
-                }
-            }
-             if (s.family_keywords) {
-                for (const kw of s.family_keywords) {
-                    if (q.includes(kw)) return { spread: s };
-                }
-            }
-            if (s.love_keywords) {
-                for (const kw of s.love_keywords) {
-                    if (q.includes(kw)) return { spread: s };
-                }
-            }
-        }
-        return { spread: defaultSpread };
-    }
+        let subjects = ['You', 'The Other'];
+        const matchMy = q.match(/my (\w+)/);
+        if (matchMy && matchMy[1]) { subjects[1] = `Your ${matchMy[1].charAt(0).toUpperCase() + matchMy[1].slice(1)}`; }
 
+        const interpersonal = spreads.find(s => s.name === "Interpersonal Dynamics");
+        for (const kw of interpersonal.family_keywords) { if (q.includes(kw)) return { spread: interpersonal, context: 'family', subjects }; }
+        for (const kw of interpersonal.love_keywords) { if (q.includes(kw)) return { spread: interpersonal, context: 'love', subjects }; }
+        
+        for (const s of spreads) { if (s.keywords) for (const kw of s.keywords) if (q.includes(kw)) return { spread: s, context: s.context, subjects: [] }; }
+        
+        return { spread: defaultSpread, context: defaultSpread.context, subjects: [] };
+    }
 
     function drawCardsFromPool(pool, num) {
         const shuffledPool = [...pool].sort(() => 0.5 - Math.random());
         return shuffledPool.slice(0, num).map(card => ({...card, isReversed: Math.random() < 0.5}));
     }
 
-    async function displayAndInterpretCards(cards, spread, question) {
-        ui.interpretationArea.className = currentDeck.class;
-        
+    function displayAndInterpretCards(cards, spread, subjects, context) {
         ui.cardDisplay.style.display = "flex";
         ui.cardDisplay.innerHTML = '';
-        ui.interpretationArea.innerHTML = '<p>The Oracle is weaving the threads of fate... please wait.</p>';
+        ui.interpretationArea.innerHTML = '';
+        
+        // --- IMPROVED: Add fanned class based on number of cards ---
+        ui.cardDisplay.classList.remove('fanned-3', 'fanned-5');
+        if (cards.length === 3) ui.cardDisplay.classList.add('fanned-3');
+        else if (cards.length === 5) ui.cardDisplay.classList.add('fanned-5');
 
         cards.forEach((card, index) => {
-            const positionName = spread.positions[index]
+            const positionName = subjects.length ? spread.positions[index].replace('Your', subjects[0]).replace("The Other's", subjects[1] + "'s") : spread.positions[index];
             const container = createCardContainer(card, positionName);
             ui.cardDisplay.appendChild(container);
             
-            setTimeout(() => container.classList.add('flipped'), (index + 1) * 400);
-        });
-        
-        const aiInterpretation = await getAiInterpretation(question, spread, cards, currentDeck);
-        ui.interpretationArea.innerHTML = aiInterpretation;
+            const interpBlock = createInterpretationBlock(card, positionName, context);
+            ui.interpretationArea.appendChild(interpBlock);
 
+            setTimeout(() => {
+                container.classList.add('flipped');
+                interpBlock.classList.add('visible');
+            }, (index + 1) * 400);
+        });
+
+        // --- IMPROVED: Logic for stacking interpretation cards ---
+        const interpBlocks = ui.interpretationArea.querySelectorAll('.interpretation-block');
+        if (interpBlocks.length > 1) {
+            ui.interpretationArea.classList.add('stacked');
+            interpBlocks.forEach((block, i) => {
+                block.style.top = `${i * 50}px`; // Stagger them by 50px
+                block.style.zIndex = i + 1;
+                block.classList.add(currentDeck.class); // Add theme class for hover border
+            });
+        }
+        
         setTimeout(() => {
             ui.submitButton.disabled = false;
-            ui.userInput.placeholder = "Reading complete. Type 'reset' to start over.";
+            ui.userInput.placeholder = "Ask for clarification or type 'reset'...";
         }, cards.length * 400 + 200);
     }
     
+    // --- Manual Draw Functions ---
     function displayFullManualSpread() {
-        ui.confirmSelectionBtn.className = '';
         ui.confirmSelectionBtn.classList.toggle('dark-tarot', currentDeck.class === 'darkTarot');
-
         ui.manualSelectionGrid.innerHTML = '';
         selectedManualCards = [];
         const shuffledDeck = [...currentDeck.cards].sort(() => 0.5 - Math.random());
@@ -823,7 +802,7 @@
             const miniCard = document.createElement('div');
             miniCard.className = 'mini-card';
             miniCard.classList.add(currentDeck.class);
-            miniCard.innerHTML = "✶";
+            miniCard.textContent = "✶";
             miniCard.dataset.cardData = JSON.stringify({...card, isReversed: Math.random() < 0.5});
             miniCard.addEventListener('click', handleMiniCardClick);
             ui.manualSelectionGrid.appendChild(miniCard);
@@ -833,20 +812,9 @@
     
     function handleMiniCardClick(event) {
         const miniCard = event.currentTarget;
-        const cardData = JSON.parse(miniCard.dataset.cardData);
-
         if (selectedManualCards.length >= 3 && !miniCard.classList.contains('selected')) return;
 
         miniCard.classList.toggle('selected');
-        
-        if (miniCard.classList.contains('selected')) {
-            miniCard.innerHTML = `<span class="mini-card-name">${cardData.name} ${cardData.isReversed ? '(R)' : ''}</span>`;
-        } else {
-            miniCard.innerHTML = "✶";
-        }
-        
-        miniCard.classList.toggle('dark-tarot', currentDeck.class === 'darkTarot' && miniCard.classList.contains('selected'));
-        
         selectedManualCards = Array.from(ui.manualSelectionGrid.querySelectorAll('.selected'));
         updateManualSelectionPrompt();
     }
@@ -859,15 +827,60 @@
 
     function handleConfirmSelection() {
         ui.manualSelectionContainer.style.display = 'none';
-        
-        const userMessages = ui.chatLog.getElementsByClassName('user-message');
-        const lastQuestion = userMessages.length > 0 ? userMessages[userMessages.length - 1].innerText : "The cards I have chosen.";
-        
         const chosenCards = selectedManualCards.map(el => JSON.parse(el.dataset.cardData));
-        
-        displayAndInterpretCards(chosenCards, manualSpread, lastQuestion);
+        displayManualCardsFaceDown(chosenCards, manualSpread);
+    }
+
+    function displayManualCardsFaceDown(cards) {
+        ui.cardDisplay.style.display = 'flex';
+        ui.cardDisplay.innerHTML = '';
+        ui.interpretationArea.innerHTML = '';
+
+        // --- IMPROVED: Apply fanned layout to manual draw as well ---
+        if (cards.length === 3) ui.cardDisplay.classList.add('fanned-3');
+
+        cards.forEach((card, index) => {
+            const positionName = manualSpread.positions[index];
+            const container = createCardContainer(card, positionName);
+            container.classList.add('manual-unflipped');
+            ui.cardDisplay.appendChild(container);
+
+            container.addEventListener('click', () => handleManualCardFlip(container, card, positionName, manualSpread.context), { once: true });
+        });
+        addMessageToLog('oracle', "Your chosen cards are before you. Click each one to reveal its meaning.");
     }
     
+    function handleManualCardFlip(container, card, position, context) {
+        container.classList.remove('manual-unflipped');
+        container.classList.add('flipped');
+        
+        const interpBlock = createInterpretationBlock(card, position, context);
+        ui.interpretationArea.appendChild(interpBlock);
+        
+        // --- IMPROVED: Apply stacking to manual interpretations too ---
+        const interpBlocks = Array.from(ui.interpretationArea.querySelectorAll('.interpretation-block'));
+        if (interpBlocks.length > 1) {
+            if(!ui.interpretationArea.classList.contains('stacked')) {
+                ui.interpretationArea.classList.add('stacked');
+            }
+            interpBlocks.forEach((block, i) => {
+                block.style.top = `${i * 50}px`;
+                block.style.zIndex = i + 1;
+                if(!block.classList.contains(currentDeck.class)) {
+                    block.classList.add(currentDeck.class);
+                }
+            });
+        }
+        
+        setTimeout(() => interpBlock.classList.add('visible'), 50);
+
+        if (ui.cardDisplay.querySelectorAll('.manual-unflipped').length === 0) {
+            ui.submitButton.disabled = false;
+            ui.userInput.placeholder = "Ask for clarification or type 'reset'...";
+        }
+    }
+    
+    // --- Helper Functions ---
     function createCardContainer(card, position) {
         const container = document.createElement('div');
         container.className = `tarot-card-container ${card.isReversed ? 'reversed' : ''}`;
@@ -881,6 +894,25 @@
         </div>`;
         return container;
     }
+
+    function createInterpretationBlock(card, position, context) {
+        const meanings = card.isReversed ? card.meanings.reversed : card.meanings.upright;
+        const contextMeaning = meanings[context] || meanings.general;
+
+        let html = `<strong>${position} (${card.name} ${card.isReversed ? '(R)' : ''})</strong>`;
+        html += `<p>${meanings.general}</p>`;
+        if (context !== 'general' && contextMeaning !== meanings.general) {
+            html += `<div class="context-focus ${currentDeck.class}">
+                        <p><strong>In ${context.charAt(0).toUpperCase() + context.slice(1)}:</strong> ${contextMeaning}</p>
+                    </div>`;
+        }
+        html += `<span class="blunt-advice ${currentDeck.class}"><strong>Actionable Advice:</strong> ${card.meanings.blunt}</span>`;
+        
+        const div = document.createElement('div');
+        div.className = 'interpretation-block';
+        div.innerHTML = html;
+        return div;
+    }
     
     function resetForNewReading() {
         transitionToScreen(ui.deckSelectionScreen, ui.readingChamberScreen);
@@ -889,7 +921,6 @@
         selectedManualCards = [];
         ui.cardDisplay.innerHTML = '';
         ui.interpretationArea.innerHTML = '';
-        ui.interpretationArea.className = '';
         ui.spreadNameEl.textContent = '';
         ui.spreadNameEl.classList.remove('visible');
         ui.chatLog.innerHTML = '';
@@ -898,6 +929,10 @@
         ui.cardDisplay.style.display = 'flex';
         ui.userInput.placeholder = "Ask your question...";
         ui.submitButton.disabled = false;
+        
+        // --- IMPROVED: Cleanup classes on reset ---
+        ui.cardDisplay.classList.remove('fanned-3', 'fanned-5');
+        ui.interpretationArea.classList.remove('stacked');
     }
 
     function transitionToScreen(newScreen, oldScreen) {
@@ -909,10 +944,11 @@
     function addMessageToLog(sender, text) {
         const messageEl = document.createElement('div');
         messageEl.classList.add('chat-message', `${sender}-message`);
-        messageEl.innerHTML = text; 
+        messageEl.innerHTML = text;
         ui.chatLog.appendChild(messageEl);
         ui.chatLog.scrollTop = ui.chatLog.scrollHeight;
     }
 </script>
 </body>
 </html>
+```
