@@ -643,7 +643,7 @@
             6.  Refer to the cards by name within the narrative to connect your points back to the reading.
         `;
         
-        const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+        const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${apiKey}`;
 
         try {
             const response = await fetch(apiEndpoint, {
@@ -660,7 +660,7 @@
                     safetySettings: [
                         { "category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE" },
                         { "category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE" },
-                        { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" }, // Corrected Typo
+                        { "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE" },
                         { "category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE" }
                     ]
                 })
